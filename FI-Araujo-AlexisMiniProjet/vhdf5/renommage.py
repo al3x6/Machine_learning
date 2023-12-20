@@ -1,7 +1,7 @@
 import os
 
 # Chemin du dossier contenant les images
-dossier = "donnees_basique/train/tulip/"
+dossier = "donnees_basique/rose/"
 
 # Liste tous les fichiers du dossier
 fichiers = os.listdir(dossier)
@@ -14,7 +14,7 @@ for fichier in fichiers:
     # Vérifie si le fichier est un fichier JPG
     if fichier.endswith(".jpg") or fichier.endswith(".JPG"):
         # Crée le nouveau nom
-        nouveau_nom = os.path.join(dossier, f"tulip.{compteur}.jpg")
+        nouveau_nom = os.path.join(dossier, f"rose.{compteur}.jpg")
 
         # Renomme le fichier
         ancien_chemin = os.path.join(dossier, fichier)
