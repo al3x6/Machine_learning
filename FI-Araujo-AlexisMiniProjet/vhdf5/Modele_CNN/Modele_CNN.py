@@ -7,8 +7,8 @@ import tensorflow as tf
 from tqdm import tqdm
 
 # Chargement des données
-dataset_train = "datasets/train_set.hdf5"
-dataset_test = "datasets/test_set.hdf5"
+dataset_train = "../datasets/train_set.hdf5"
+dataset_test = "../datasets/test_set.hdf5"
 
 # Chargement du dataset d'entraînement
 dataset = h5py.File(dataset_train, "r")
@@ -99,5 +99,5 @@ def predict_single_image(image_path, model, image_size=(64, 64)):
         print("Tulipe", prediction)
 
 # Utilisation de la fonction pour prédire une image avec le modèle entraîné
-image_path_to_predict = 'donnees_basique/rose1.jpg'
+image_path_to_predict = '../donnees_basique/rose1.jpg'
 predict_single_image(image_path_to_predict, trained_model)

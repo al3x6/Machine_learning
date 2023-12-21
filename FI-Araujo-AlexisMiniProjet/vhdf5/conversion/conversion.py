@@ -33,10 +33,10 @@ def images_to_hdf5_dataset(imageFormat, data_repo, h5file, img_width, img_height
 IMG_WIDTH = 64
 IMG_HEIGHT = 64
 
-repo_training_set = "donnees_basique/train/"
-repo_test_set = "donnees_basique/test/"
-dataset_train = "datasets/train_set.hdf5"
-dataset_test = "datasets/test_set.hdf5"
+repo_training_set = "../donnees_basique/train/"
+repo_test_set = "../donnees_basique/test/"
+dataset_train = "../datasets/train_set.hdf5"
+dataset_test = "../datasets/test_set.hdf5"
 
 #on convertit les images du train set en un fichier hdf5
 images_to_hdf5_dataset("jpg", repo_training_set, dataset_train, IMG_WIDTH, IMG_HEIGHT)

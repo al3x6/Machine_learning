@@ -1,48 +1,49 @@
+from PIL import Image
 import numpy as np
 from sklearn.datasets import make_blobs
 from sklearn.metrics import accuracy_score
 #!pip install h5py
-from utilities import *
+#from utilities import *
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import h5py
+import glob
+# import cv2
 
-def load_data(file_name='datasets/trainset.hdf5'):
-    with h5py.File(file_name, 'r') as hdf:
-        x = hdf['X'][:]
-        y = hdf['y'][:]
-    return x, y
+## Importation du dataSet
 
-# Chargement de données d'entrainement et de test
-x_train, y_train = load_data('datasets/trainset.hdf5')
+dataset_train = "../datasets/train_set.hdf5"
+dataset_test = "../datasets/test_set.hdf5"
 
+#on load le dataset d'entrainement
+dataset = h5py.File(dataset_train, "r")
 
-def load_data(file_name='datasets/testset.hdf5'):
-    with h5py.File(file_name, 'r') as hdf:
-        x = hdf['X'][:]
-        y = hdf['y'][:]
-    return x, y
+x_train = np.array(dataset["X"][:])
+y_train = np.array(dataset["y"][:])
 
-# Chargement de données d'entrainement et de test
-x_test, y_test = load_data('datasets/testset.hdf5')
+#on load le dataset de test
+dataset = h5py.File(dataset_test, "r")
 
+x_test = np.array(dataset["X"][:])
+y_test = np.array(dataset["y"][:])
+
+#x_train, x_test, y_train, y_test  = load_data_train()
 
 # Afficher les dimensions des données d'entrainement et des étiquettes
 print(x_train.shape)
-y_train=y_train.reshape(y_train.shape[0], -1)
+y_train = y_train.reshape(y_train.shape[0], 1)
 print(y_train.shape)
 # Utilisation de np.unique avec return_counts=True pour obtenir les valeurs uniques et leurs occurrences dans y_train
 print(np.unique(y_train, return_counts=True))
-print(y_train==0,y_train==1)
-
+#print(y_train == 0, y_train == 1)
 
 # Affiche les dimensions des données de test et des étiquettes
 print(x_test.shape)
-y_test=y_test.reshape(y_test.shape[0], -1)
+y_test = y_test.reshape(y_test.shape[0], 1)
 print(y_test.shape)
 # Utilisation de np.unique avec return_counts=True pour obtenir les valeurs uniques et leurs occurrences dans y_test
-print(np.unique(y_test,return_counts=True))
-
+print(np.unique(y_test, return_counts=True))
+#print(y_test == 0, y_test == 1)
 
 # Création d'une figure
 plt.figure(figsize=(16,8))
@@ -112,7 +113,6 @@ def prediction(X,W,b):
     #print(A)
     return A>=0.5
 
-
 # Entraîne un modèle de régression logistique (neurone artificiel) en utilisant la descente de gradient stochastique.
 def artificialNeuron(x_train,y_train,x_test,y_test, learning_rate=0.01, n_iter=15000):
     #initialisation
@@ -156,3 +156,63 @@ def artificialNeuron(x_train,y_train,x_test,y_test, learning_rate=0.01, n_iter=1
 
 # Appel de la fonction et affichage des courbes de coût et d'exactitude pour l'entraînement et le test
 W,b=artificialNeuron(x_train_reshape,y_train,x_test_reshape, y_test)
+
+
+#Voir si l'image est une tulipe ou une rose
+def predict_single_image(image_path, W, b, image_size=(64, 64)):
+    img = Image.open(image_path)
+    img = img.convert('L')  # Convertir en niveaux de gris si ce n'est pas déjà fait
+    img = img.resize(image_size)
+    img_array = np.array(img).reshape(1, -1) / 255.0
+
+    prediction = model(img_array, W, b)
+
+    plt.imshow(img, cmap='gray')
+    plt.axis('off')
+    plt.show()
+
+    if prediction >= 0.5:
+        print("Rose", prediction)
+    else:
+        print("Tulipe", prediction)
+
+# Utilisation de la fonction pour prédire une image
+image_path_to_predict = '../donnees_basique/rose2.jpg'
+predict_single_image(image_path_to_predict, W, b)
+
+#Création de la matrice de confusion
+from sklearn.metrics import confusion_matrix
+import itertools
+y_pred=prediction(x_test_reshape,W,b)
+cm=confusion_matrix(y_test,y_pred)
+cm_plot_labels=['rose','tulipe']
+def plot_confusion_matrix(cm,classes,normalize=False,title='Matrice de confusion',cmap=plt.cm.Blues):
+  plt.imshow(cm,interpolation='nearest',cmap=cmap)
+  plt.title(title)
+  plt.colorbar()
+  tick_marks=np.arange(len(classes))
+  plt.xticks(tick_marks, classes, rotation=45)
+  plt.yticks(tick_marks, classes)
+
+  if normalize:
+    cm=cm.astype('float')/cm.sum(axis=1)[:, np.newaxis]
+    print("Matrice de confusion normalisée")
+  else:
+    print("Matrice de confusion non normalisée")
+
+  print(cm)
+  thresh=cm.max()/2.
+  for i,j in itertools.product(range(cm.shape[0]),range(cm.shape[1])):
+    plt.text(j,i,cm[i,j],
+              horizontalalignment="center",
+              color="white" if cm[i,j] > thresh else "black")
+  plt.tight_layout()
+  plt.ylabel('Réalité')
+  plt.xlabel('Prédiction')
+plot_confusion_matrix(cm=cm,classes=cm_plot_labels,title='Matrice de confusion sur données de test')
+
+#Création du rapport de classification
+
+from sklearn.metrics import classification_report
+target_names=['roses','tulipes']
+print(classification_report(y_test,y_pred,target_names=target_names))
